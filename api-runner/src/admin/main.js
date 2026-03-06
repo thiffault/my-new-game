@@ -89,8 +89,8 @@ loginForm.addEventListener('submit', async (e) => {
     try {
         const res = await fetch(`${API_BASE}/api/admin/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ password })
         });
 
         const data = await res.json();
@@ -265,10 +265,10 @@ confirmResetBtn.addEventListener('click', async () => {
         const res = await fetch(`${API_BASE}/api/admin/reset`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({ eventId: currentEventId })
+            body: new URLSearchParams({ eventId: currentEventId })
         });
 
         if (res.status === 401) {

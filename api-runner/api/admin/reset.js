@@ -26,7 +26,8 @@ export default async function handler(req, res) {
     const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
     if (!verifyToken(token)) return res.status(401).json({ error: 'Unauthorized' });
 
-    const { eventId } = req.body || {};
+    const body = req.body || {};
+    const eventId = body.eventId || (typeof body === 'string' ? new URLSearchParams(body).get('eventId') : null);
     if (!eventId) return res.status(400).json({ error: 'eventId required' });
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
