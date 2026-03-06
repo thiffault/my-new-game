@@ -1,15 +1,4 @@
-const crypto = require('crypto');
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
-function generateToken() {
-    const timestamp = Date.now();
-    const secret = process.env.ADMIN_TOKEN_SECRET || ADMIN_PASSWORD;
-    const hmac = crypto.createHmac('sha256', secret).update(String(timestamp)).digest('hex');
-    return `${timestamp}.${hmac}`;
-}
-
-module.exports = function handler(req, res) {
+export default function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -18,9 +7,10 @@ module.exports = function handler(req, res) {
 
     const { password } = req.body || {};
 
-    if (!password || password !== ADMIN_PASSWORD) {
+    if (!password || password !== process.env.ADMIN_PASSWORD) {
         return res.status(401).json({ error: 'Incorrect password' });
     }
 
-    return res.json({ token: generateToken() });
-};
+    const token = Buffer.from(`${Date.now()}:${process.env.ADMIN_PASSWORD}`).toString('base64');
+    return res.json({ token });
+}

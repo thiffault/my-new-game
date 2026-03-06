@@ -1,25 +1,21 @@
-const crypto = require('crypto');
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const TOKEN_EXPIRY_MS = 2 * 60 * 60 * 1000;
 
 function verifyToken(token) {
     if (!token) return false;
-    const parts = token.split('.');
-    if (parts.length !== 2) return false;
-    const [timestamp, hmac] = parts;
-    const secret = process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PASSWORD;
-    const expectedHmac = crypto.createHmac('sha256', secret).update(timestamp).digest('hex');
     try {
-        if (!crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expectedHmac))) return false;
+        const decoded = Buffer.from(token, 'base64').toString('utf8');
+        const [timestamp, password] = decoded.split(':');
+        if (password !== process.env.ADMIN_PASSWORD) return false;
+        if (Date.now() - parseInt(timestamp) > TOKEN_EXPIRY_MS) return false;
+        return true;
     } catch {
         return false;
     }
-    if (Date.now() - parseInt(timestamp) > TOKEN_EXPIRY_MS) return false;
-    return true;
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 
@@ -48,4 +44,4 @@ module.exports = async function handler(req, res) {
     if (error) return res.status(500).json({ error: error.message });
 
     return res.json({ deletedCount: count || 0 });
-};
+}
