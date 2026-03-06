@@ -6,7 +6,7 @@
 import { getClickCount } from '../lib/supabase';
 
 // API base URL - configurable via environment variable
-const API_BASE = import.meta.env.VITE_ADMIN_API_URL || 'http://localhost:8787';
+const API_BASE = import.meta.env.VITE_ADMIN_API_URL || '';
 
 let authToken = null;
 let currentScores = [];
