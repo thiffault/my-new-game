@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-runner
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-runner
+  template:
+    metadata:
+      labels:
+        app: api-runner
+    spec:
+      containers:
+        - name: api-runner
+          image: api-runner:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8787
+          env:
+            - name: PORT
+              value: "8787"
+            - name: SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-runner-secrets
+                  key: SUPABASE_URL
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-runner-secrets
+                  key: SUPABASE_SERVICE_ROLE_KEY
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api-runner-secrets
+                  key: ADMIN_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /api/admin/health
+              port: 8787
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/admin/health
+              port: 8787
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

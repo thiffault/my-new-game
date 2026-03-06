@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css">
+    <title>API Runner</title>
+</head>
+
+<body>
+    <!-- Game Logo (shared across states) -->
+    <img id="game-logo" src="/icons/F5GameLogo.svg" alt="F5 Game Logo">
+
+    <!-- Start Screen Overlay -->
+    <div id="start-screen">
+        <form id="start-form">
+            <h1>API Runner</h1>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="your@email.com">
+
+            <label for="nickname">Nickname</label>
+            <input type="text" id="nickname" name="nickname" required placeholder="Your nickname">
+
+            <label for="eventId">Event ID</label>
+            <input type="text" id="eventId" name="eventId" required value="F5-API-SEC">
+
+            <div id="character-select">
+                <label>Choose your runner</label>
+                <div id="character-cards">
+                    <div class="character-card selected" data-character="suit">
+                        <img src="/icons/SuitRuner.png" alt="Suit Runner">
+                        <span class="character-name">Suit Runner</span>
+                    </div>
+                    <div class="character-card" data-character="hack">
+                        <img src="/icons/hackRunner.png" alt="Hack Runner">
+                        <span class="character-name">Hack Runner</span>
+                    </div>
+                    <div class="character-card hidden" data-character="nyan" id="nyan-card">
+                        <img src="/icons/NyanRunner.png" alt="Nyan Runner">
+                        <span class="character-name">Nyan Runner</span>
+                        <span class="unlocked-tag">Unlocked!</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="start-btn">Start Run</button>
+            <a href="#" id="clear-info">Clear Info</a>
+        </form>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="game-over-screen" class="hidden">
+        <div id="game-over-content">
+            <h1>Game Over</h1>
+            <div id="final-score">Score: 0</div>
+            <div id="tagline">Know Your API Security</div>
+            <div id="failure-message"></div>
+
+            <div id="score-actions">
+                <button id="submit-score-btn">Submit Score</button>
+                <button id="view-leaderboard-btn">View Leaderboard</button>
+            </div>
+            <div id="submit-status" class="hidden"></div>
+
+            <div id="leaderboard-container" class="hidden">
+                <h2>Top 10</h2>
+                <div id="leaderboard-list"></div>
+                <button id="close-leaderboard-btn">Close</button>
+            </div>
+
+            <a id="learn-adsp-link"
+               href="https://www.f5.com/products/f5-application-delivery-and-security-platform"
+               target="_blank"
+               rel="noopener noreferrer">
+                Learn to Sell ADSP here
+            </a>
+
+            <div id="game-over-buttons">
+                <button id="play-again-btn">Play Again</button>
+                <button id="change-info-btn">Change Player Info</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="hidden"></div>
+
+    <div id="app">
+        <div id="game-container"></div>
+    </div>
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
