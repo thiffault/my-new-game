@@ -1,5 +1,17 @@
+import crypto from 'crypto';
+
+function generateToken() {
+    const timestamp = Date.now().toString();
+    const sig = crypto
+        .createHmac('sha256', process.env.ADMIN_PASSWORD)
+        .update(timestamp)
+        .digest('hex');
+    return Buffer.from(`${timestamp}.${sig}`).toString('base64');
+}
+
 export default function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const origin = process.env.ALLOWED_ORIGIN || '*';
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
@@ -11,6 +23,5 @@ export default function handler(req, res) {
         return res.status(401).json({ error: 'Incorrect password' });
     }
 
-    const token = Buffer.from(`${Date.now()}:${process.env.ADMIN_PASSWORD}`).toString('base64');
-    return res.json({ token });
+    return res.json({ token: generateToken() });
 }

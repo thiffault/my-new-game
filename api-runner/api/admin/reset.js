@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 const TOKEN_EXPIRY_MS = 2 * 60 * 60 * 1000;
 
@@ -6,17 +7,22 @@ function verifyToken(token) {
     if (!token) return false;
     try {
         const decoded = Buffer.from(token, 'base64').toString('utf8');
-        const [timestamp, password] = decoded.split(':');
-        if (password !== process.env.ADMIN_PASSWORD) return false;
+        const [timestamp, sig] = decoded.split('.');
+        if (!timestamp || !sig) return false;
         if (Date.now() - parseInt(timestamp) > TOKEN_EXPIRY_MS) return false;
-        return true;
+        const expected = crypto
+            .createHmac('sha256', process.env.ADMIN_PASSWORD)
+            .update(timestamp)
+            .digest('hex');
+        return crypto.timingSafeEqual(Buffer.from(sig, 'hex'), Buffer.from(expected, 'hex'));
     } catch {
         return false;
     }
 }
 
 export default async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const origin = process.env.ALLOWED_ORIGIN || '*';
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
