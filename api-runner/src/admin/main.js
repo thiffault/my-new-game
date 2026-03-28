@@ -64,17 +64,22 @@ function checkAuth() {
 }
 
 async function loadEvents() {
+    eventIdInput.innerHTML = '<option value="">Loading events...</option>';
     try {
         const res = await fetch(`${API_BASE}/api/admin/events`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!res.ok) return;
         const data = await res.json();
+        if (!res.ok) {
+            eventIdInput.innerHTML = `<option value="">Error: ${data.error || res.status}</option>`;
+            return;
+        }
         eventIdInput.innerHTML = data.events.length === 0
             ? '<option value="">No events found</option>'
             : data.events.map(e => `<option value="${e}">${e}</option>`).join('');
-    } catch {
+    } catch (err) {
         eventIdInput.innerHTML = '<option value="">Failed to load events</option>';
+        console.error('loadEvents error:', err);
     }
 }
 
