@@ -21,7 +21,7 @@ const adminMessage = document.getElementById('admin-message');
 const passwordInput = document.getElementById('password');
 const loginBtn = document.getElementById('login-btn');
 const logoutBtn = document.getElementById('logout-btn');
-const eventIdInput = document.getElementById('event-id');
+const eventIdInput = document.getElementById('event-id');  // now a <select>
 const loadBtn = document.getElementById('load-btn');
 const exportBtn = document.getElementById('export-btn');
 const resetBtn = document.getElementById('reset-btn');
@@ -63,9 +63,25 @@ function checkAuth() {
     }
 }
 
+async function loadEvents() {
+    try {
+        const res = await fetch(`${API_BASE}/api/admin/events`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        eventIdInput.innerHTML = data.events.length === 0
+            ? '<option value="">No events found</option>'
+            : data.events.map(e => `<option value="${e}">${e}</option>`).join('');
+    } catch {
+        eventIdInput.innerHTML = '<option value="">Failed to load events</option>';
+    }
+}
+
 function showAdminSection() {
     loginSection.style.display = 'none';
     adminSection.classList.add('visible');
+    loadEvents();
 }
 
 function showLoginSection() {
